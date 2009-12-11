@@ -82,14 +82,14 @@ inline void decode2chars(unsigned char encoded, unsigned char chars[3]);
 /***************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-#define DNA_LEN 13
-#define NIDX 4
+#define DNA_LEN 14
+#define NIDX 5
 #define DEBUG 0
 #define CONST_FREE(x) free((void *)(x))
 
 /* ordered alphabetically. 'Z' means end of string. */
-const unsigned char DNA[] = "\0ACGNTXacgntx";
-//                            0123456789012
+const unsigned char DNA[] = "\0-ACGNTXacgntx";
+//                            01234567890123
 
 inline unsigned char dnapos(unsigned char p){
     unsigned char i = -1;
@@ -98,7 +98,7 @@ inline unsigned char dnapos(unsigned char p){
 #if DEBUG
         printf("bad char:%c\n replacing with N", p);
 #endif
-        i = 4;
+        i = NIDX;
     }
     return i;
 }

@@ -108,6 +108,7 @@ void test_bad_chars(){
     unsigned char *encoded = (unsigned char *)encode((unsigned char *)seq);
     size_t seq_len = strlen(seq);
     char *reseq = (char *)decode(encoded);
+    
     TEST_OK(!strcmp("NNNAACCNN", reseq));
     free(reseq);
     free(encoded);
@@ -124,10 +125,11 @@ void test_bad_chars(){
 
 int test_encode_decode(){
     unsigned char chars[3];
-    unsigned char posns[10] = {24, 25, 18, 28, 18, 18, 30, 22, 24, 0};
+    unsigned char posns[11] = {44, 32, 29, 38, 29, 29, 40, 32, 44, 0};
     decode2chars(8, chars);
 
     char *seq = (char *)decode((unsigned char*)posns);
+    //printf("\nseq:%s\n", seq);
 
     // first 2 and last 2 letters are the sam.e
     TEST_OK(seq[0] == seq[16]);
@@ -181,6 +183,7 @@ void test_file(){
     _test_read_write("", "wb");
     _test_read_write("A", "wb");
     _test_read_write("C", "ab");
+    _test_read_write("---------", "ab");
     // cleanup.
     remove(TEST_FILE);
 
