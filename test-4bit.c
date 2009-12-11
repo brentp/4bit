@@ -40,7 +40,7 @@ int test_count;
        } while (1); } while(0);
 
 void test_decoder(char *seq){
-    unsigned char *encoded = encode((unsigned char *)seq);
+    unsigned char *encoded = (unsigned char *)encode((unsigned char *)seq);
 
     char *reseq = (char *)decode(encoded);   
     //printf("%s, %s\n", seq, reseq);
@@ -113,14 +113,14 @@ int test_encode_decode2chars(){
 void test_bad_chars(){
     
     char *seq = "ZZZAACCZZ";
-    unsigned char *encoded = encode((unsigned char *)seq);
+    unsigned char *encoded = (unsigned char *)encode((unsigned char *)seq);
     size_t seq_len = strlen(seq);
     char *reseq = (char *)decode(encoded);
     TEST_OK(!strcmp("NNNAACCNN", reseq));
     free(reseq);
 
     char *seq2 = "ZZ";
-    encoded = encode((unsigned char *)seq2);
+    encoded = (unsigned char *)encode((unsigned char *)seq2);
     seq_len = strlen(seq2);
     reseq = (char *)decode(encoded);
     TEST_OK(!strcmp("NN", reseq));
@@ -167,7 +167,7 @@ void _test_read_write(char *seq, char mode[2]){
     
     fh = fopen("afile.bin", "rb");
     fseek(fh, 0, 0);
-    char *read_seq = (char *)fdecode(fh, file_pos * 2, pos * 2);
+    char *read_seq = (char *)fdecode(fh, file_pos, pos);
     TEST_OK(!strcmp(seq, read_seq));
     free(read_seq);
     fclose(fh);
@@ -184,6 +184,7 @@ void test_file(){
     _test_read_write("CCCCCCccaaccCCaaCCaCaGAAAAAAAAAAAAAAACC", "ab");
     _test_read_write("", "wb");
     _test_read_write("A", "wb");
+    _test_read_write("C", "ab");
     // cleanup.
     remove(TEST_FILE);
 
@@ -201,5 +202,5 @@ int main(){
 
     TEST_END;
 
-    return 1;
+    return 0;
 }

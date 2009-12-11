@@ -19,7 +19,7 @@
  * `encode`: encode a dna sequence string into a string of unsigned chars.
  * the returned value must be free'd.  
  * */
-unsigned char *encode(unsigned char *dna_seq);
+const unsigned char *encode(unsigned char *dna_seq);
 
 /* 
  * `fencode`: encode the given dna_seq string and write it to the file.
@@ -36,10 +36,10 @@ const unsigned char *decode(unsigned char *positions);
 
 /*
  * `fdecode`: return the dna sequence string encoded in the file
- * at (0-based) base pair positions bp_start to bp_end inclusive.
+ * at (0-based) file positions fh_start to fh_end inclusive.
  * the return value must be free'd.
  */
-const char *fdecode(FILE *fh, size_t bp_start, size_t bp_end);
+const char *fdecode(FILE *fh, size_t fh_start, size_t fh_end);
 
 // see `fencodes`
 typedef struct f4bit {
@@ -85,6 +85,8 @@ inline void decode2chars(unsigned char encoded, unsigned char chars[3]);
 #define DNA_LEN 13
 #define NIDX 4
 #define DEBUG 0
+#define CONST_FREE(x) free((void *)(x))
+
 /* ordered alphabetically. 'Z' means end of string. */
 const unsigned char DNA[] = "\0ACGNTXacgntx";
 //                            0123456789012
@@ -108,7 +110,7 @@ inline unsigned char encode2chars(unsigned char pair[3]){
     return (pos0 * DNA_LEN + pos1) ;
 }
 
-unsigned char *encode(unsigned char *seq){
+const unsigned char *encode(unsigned char *seq){
     // handle odd chars here.
     size_t seq_len = strlen((char *)seq);
     unsigned char *encoded = \
@@ -126,12 +128,12 @@ unsigned char *encode(unsigned char *seq){
 }
 
 size_t fencode(FILE *fh, unsigned char *seq){
-    unsigned char *encoded = encode(seq);
+    const unsigned char *encoded = encode(seq);
     unsigned int seq_len = strlen((char *)seq);
     // division truncates. so add 1.
     unsigned int n = (seq_len + 1) / 2;
     fwrite(encoded, sizeof(unsigned char), n, fh);
-    free(encoded);
+    CONST_FREE(encoded);
     // returns the encoded position in the file (double to conver to)
     return ftell(fh);
 }
@@ -139,14 +141,14 @@ size_t fencode(FILE *fh, unsigned char *seq){
 const f4bit *fencodes(FILE *fh, unsigned char *seq){
     f4bit *f4;
     f4 = (f4bit *)malloc((sizeof(f4bit)));
-    unsigned char *encoded = encode(seq);
+    const unsigned char *encoded = encode(seq);
     unsigned int seq_len = strlen((char *)seq);
     f4->fh_start = ftell(fh);
     f4->bp_start = (f4->fh_start + 1) / 2;
     // division truncates. so add 1.
     unsigned int n = (seq_len + 1) / 2;
     fwrite(encoded, sizeof(unsigned char), n, fh);
-    free(encoded);
+    CONST_FREE(encoded);
     // returns the encoded position in the file (double to conver to)
     f4->fh_end = ftell(fh);
     f4->bp_end = f4->bp_start + seq_len;
@@ -174,18 +176,17 @@ const unsigned char *decode(unsigned char *positions){
     return seq;
 }
 
-const char *fdecode(FILE *fh, size_t bp_start, size_t bp_end){
+const char *fdecode(FILE *fh, size_t fh_start, size_t fh_end){
 
-    size_t n = bp_end - bp_start;
+    size_t n = fh_end - fh_start;
     //printf("decode n: %i\n", n);
-    size_t upn = n + 1;
     unsigned char *encoded = (unsigned char *)(malloc(\
-                sizeof(unsigned char) * (upn / 2)));
+                sizeof(unsigned char) * (n / 2 + 1)));
 
-    // seek to bp_start
-    fseek(fh, (bp_start + 1) / 2, SEEK_SET);
+    // seek to fh_start
+    fseek(fh, fh_start, SEEK_SET);
     // read the desired amount
-    fread(encoded, sizeof(unsigned char), upn / 2, fh);
+    fread(encoded, sizeof(unsigned char), n, fh);
     char *seq = (char *)decode(encoded);
     return seq;
 }

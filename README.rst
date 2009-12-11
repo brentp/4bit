@@ -27,7 +27,7 @@ encode a dna sequence string into a string of unsigned chars.
 the returned value must be free'd.  
 ::
 
-    unsigned char *encode(unsigned char *dna_seq);
+    const unsigned char *encode(unsigned char *dna_seq);
 
 
 `fencode`
@@ -49,11 +49,11 @@ the return value must be free`d
 
 `fdecode`
 ---------
-return the dna sequence string encoded in the file at (0-based) base pair
-positions bp_start to bp_end inclusive. the return value must be free'd.
+return the dna sequence string encoded in the file at (0-based) file 
+positions fh_start to fh_end inclusive. the return value must be free'd.
 ::
     
-    const char* fdecode(FILE *fh, size_t bp_start, size_t bp_end);
+    const char* fdecode(FILE *fh, size_t fh_start, size_t fh_end);
 
 `f4bit struct`
 --------------
