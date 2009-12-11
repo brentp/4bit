@@ -29,7 +29,7 @@ unsigned char *encode(unsigned char *dna_seq);
 size_t fencode(FILE *fh, unsigned char *seq);
 
 /*
- * `decode`: decode an encoded value into it's dna sequnce
+ * `decode`: decode an encoded value into it's dna sequence
  * string. the return value must be free`d
  */
 const unsigned char *decode(unsigned char *positions);
@@ -41,6 +41,7 @@ const unsigned char *decode(unsigned char *positions);
  */
 const char *fdecode(FILE *fh, size_t bp_start, size_t bp_end);
 
+// see `fencodes`
 typedef struct f4bit {
     size_t bp_start; // 0 -based
     size_t bp_end; // 0 -based
@@ -50,8 +51,8 @@ typedef struct f4bit {
 
 /*
  * `fencodes`: identical to `fencode` except the return value is
- * and f4bit struct pointer containing the base-pair and file-handle
- * start and stop of the data. useful for creating an index to save
+ * a f4bit struct pointer containing the base-pair and file-handle
+ * start and end of the data -- useful for creating an index to save
  * where particular chromosomes start and stop within the file.
  * the return value must be free`d.
  */
