@@ -19,7 +19,7 @@
  * `encode`: encode a dna sequence string into a string of unsigned chars.
  * the returned value must be free'd.  
  * */
-const unsigned char *encode(unsigned char *dna_seq);
+unsigned char *encode(const unsigned char *dna_seq);
 
 /* 
  * `fencode`: encode the given dna_seq string and write it to the file.
@@ -32,7 +32,7 @@ size_t fencode(FILE *fh, unsigned char *seq);
  * `decode`: decode an encoded value into it's dna sequence
  * string. the return value must be free`d
  */
-const unsigned char *decode(unsigned char *positions);
+const unsigned char *decode(const unsigned char *positions);
 
 /*
  * `fdecode`: return the dna sequence string encoded in the file
@@ -110,11 +110,11 @@ inline unsigned char encode2chars(unsigned char pair[3]){
     return (pos0 * DNA_LEN + pos1) ;
 }
 
-const unsigned char *encode(unsigned char *seq){
+unsigned char *encode(const unsigned char *seq){
     // handle odd chars here.
     size_t seq_len = strlen((char *)seq);
     unsigned char *encoded = \
-                (unsigned char *)malloc(sizeof(unsigned char) * seq_len / 2);
+                (unsigned char *)malloc(sizeof(unsigned char) * ((seq_len + 1) / 2 + 1));
     unsigned int i = 0;
     unsigned char pair[3];
     pair[2] = '\0';
@@ -122,8 +122,9 @@ const unsigned char *encode(unsigned char *seq){
         pair[0] = seq[i];
         pair[1] = seq[i + 1];
         encoded[i / 2] = encode2chars(pair);
-        
     }
+    //encoded[i - (int)((seq_len + 1) % 2)] = '\0';
+    encoded[(i + 1)/ 2] = '\0';
     return encoded;
 }
 
@@ -161,13 +162,13 @@ inline void decode2chars(unsigned char encoded, unsigned char chars[3]){
     chars[2] = '\0';
 }
 
-const unsigned char *decode(unsigned char *positions){
+const unsigned char *decode(const unsigned char *positions){
     size_t n_positions = strlen((char *)positions);
     unsigned char *seq = (unsigned char *)malloc(\
             sizeof(unsigned char) * (n_positions * 2 + 1));
 
     unsigned pos, i;
-    for(i=0; i < 2 * n_positions; i+=2){
+    for(i=0; i < 2 * n_positions + 1; i+=2){
         pos = positions[i/2];
         seq[i] = DNA[pos / DNA_LEN];
         seq[i + 1] = DNA[pos % DNA_LEN];
@@ -179,14 +180,19 @@ const unsigned char *decode(unsigned char *positions){
 const char *fdecode(FILE *fh, size_t fh_start, size_t fh_end){
 
     size_t n = fh_end - fh_start;
-    //printf("decode n: %i\n", n);
+    if(n == 0){
+        char * s = (char *)malloc(sizeof(char *) * 1);
+        s[0] = '\0';
+        return s;
+    }
     unsigned char *encoded = (unsigned char *)(malloc(\
-                sizeof(unsigned char) * (n / 2 + 1)));
+                sizeof(unsigned char) * (n + 1)));
 
     // seek to fh_start
     fseek(fh, fh_start, SEEK_SET);
     // read the desired amount
     fread(encoded, sizeof(unsigned char), n, fh);
     char *seq = (char *)decode(encoded);
+    free(encoded);
     return seq;
 }

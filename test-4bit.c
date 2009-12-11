@@ -27,11 +27,6 @@ int test_count;
            TEST_OK(!strcmp((char *)chars, (char *)c2)); \
        } while(0);
 
-#define TEST_ENCODE_DECODE(c2) do { \
-           decode(encode((unsigned char *)c2), char_str);\
-           TEST_OK(!strcmp((char *)char_str, (char *)c2)); \
-       } while(0);
-
 #define PRINT_ENCODED(d, len) do { \
        int j=0; \
        do {\
@@ -39,13 +34,15 @@ int test_count;
          if (j >= len) { break; }\
        } while (1); } while(0);
 
-void test_decoder(char *seq){
-    unsigned char *encoded = (unsigned char *)encode((unsigned char *)seq);
+void test_decoder(const char *seq){
+    char *encoded = (char *)encode((unsigned char *)seq);
 
-    char *reseq = (char *)decode(encoded);   
-    //printf("%s, %s\n", seq, reseq);
-
+    char *reseq = (char *)decode((unsigned char *)encoded);   
     TEST_OK(!strcmp(seq, reseq));
+
+    CONST_FREE(reseq);
+    CONST_FREE(encoded);
+      
 }
 
 void test_struct(){
@@ -69,26 +66,21 @@ void test_struct(){
 }
 
 int test_odd_length_strings(){
-    char *seq = "AGT\0\0\0\0";
-    test_decoder(seq);
+    test_decoder("");
 
-    seq = "AA\0A";
-    test_decoder(seq);
+    test_decoder("AGT\0\0\0\0");
 
-    seq = "AAC\0A";
-    test_decoder(seq);
+    test_decoder("AA\0A");
+
+    test_decoder("AAC\0A");
     
-    seq = "AaC\0A";
-    test_decoder(seq);
+    test_decoder("AaC\0A");
 
-    seq = "AAC";
-    test_decoder(seq);
+    test_decoder("AAC");
 
-    seq = "A\0\0";
-    test_decoder(seq);
+    test_decoder("A\0\0");
 
-    seq = "\0\0AAAAAAAAAAAAA";
-    test_decoder(seq);
+    test_decoder("\0\0AAAAAAAAAAAAA");
 
     return 1;
 }
@@ -118,12 +110,15 @@ void test_bad_chars(){
     char *reseq = (char *)decode(encoded);
     TEST_OK(!strcmp("NNNAACCNN", reseq));
     free(reseq);
+    free(encoded);
 
     char *seq2 = "ZZ";
     encoded = (unsigned char *)encode((unsigned char *)seq2);
     seq_len = strlen(seq2);
     reseq = (char *)decode(encoded);
     TEST_OK(!strcmp("NN", reseq));
+    free(reseq);
+    free(encoded);
 
 }
 
@@ -165,9 +160,10 @@ void _test_read_write(char *seq, char mode[2]){
     fclose(fh);
 
     
-    fh = fopen("afile.bin", "rb");
-    fseek(fh, 0, 0);
+    fh = fopen(TEST_FILE, "rb");
+    //printf("%i:%i\n", file_pos, pos);
     char *read_seq = (char *)fdecode(fh, file_pos, pos);
+    //printf("%s, %s\n", seq, read_seq);
     TEST_OK(!strcmp(seq, read_seq));
     free(read_seq);
     fclose(fh);
