@@ -157,6 +157,7 @@ const f4bit *fencodes(FILE *fh, unsigned char *seq){
 }
 
 inline void decode2chars(unsigned char encoded, unsigned char chars[3]){
+    if(encoded > 255){ encoded = 255; } // TODO: fix this.
     chars[0] =  DNA[encoded / DNA_LEN];
     chars[1] =  DNA[encoded % DNA_LEN];
     chars[2] = '\0';

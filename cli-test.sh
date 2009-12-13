@@ -7,6 +7,7 @@ SEQS[3]=N-XA
 SEQS[4]=AAAAAAAAAAAA
 SEQS[5]=CACACAGG-Xc
 SEQS[6]=actgACTGxXnN-
+SEQS[7]=a
 
 PASS=0
 FAIL=0
@@ -22,6 +23,17 @@ do
         PASS=$(( $PASS+1 ))
     fi
 done
+#         NANNNTTNNN
+OUT=`echo BADLETTERS | ./4bit-cli encode | ./4bit-cli decode`
+if [ "$OUT" != "NANNNTTNNN" ]
+then
+    FAIL=$(( $FAIL + 1 ))
+    echo $OUT
+else
+    PASS=$(( $PASS + 1))
+fi
+
+
 TOT=$(( $PASS + $FAIL ))
 echo ""
 echo "$PASS / $TOT tests PASS"
