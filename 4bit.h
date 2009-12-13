@@ -1,5 +1,5 @@
 /*
- * 4bit encoding of DNA sequence with alphabet of: "ACGNTXacgntx" other
+ * 4bit encoding of DNA sequence with alphabet of: "-ACGNTXacgntx" other
  * characters are encoded as 'N'. The encoding works by putting 2 chars
  * into a single unsigned char. Since there are 255 unsigned chars, and
  * only 12 * 12 = 144 pairs in our alphabet, this works simply.

@@ -11,12 +11,12 @@
 About
 =====
 
-4bit encoding of DNA sequence with alphabet of: "ACGNTXacgntx" other
+4bit encoding of DNA sequence with alphabet of: "-ACGNTXacgntx" other
 characters are encoded as 'N'. The encoding works by putting 2 chars
 into a single unsigned char. Since there are 255 unsigned chars, and
 only 12 * 12 = 144 pairs in our alphabet, this works simply.
-The code is contained entirely in this file: '4bit.h' with the API
-function signatures defined and documented just below here.
+The code is contained entirely in the file: '4bit.h' with the API
+function signatures defined and documented below.
 
 API
 ===
@@ -75,6 +75,10 @@ chromosomes start and stop within the file. the return value must be free`d.
 ::
 
     const f4bit* fencodes(FILE *fh, unsigned char *seq);
+
+CLI
+===
+in progress. see 4bit-cli.c and test.sh
 
 Development
 ===========
