@@ -5,7 +5,7 @@ TCDB_STATIC=$(TCDB_DIR)/libcdb.a
 
 4bit-cli: 4bit-cli.c 4bit.h $(TCDB_STATIC)
 	@rm -f 4bit-cli;
-	gcc -Wall 4bit-cli.c $(TCDB_STATIC) -o 4bit-cli
+	gcc -I$(TCDB_DIR) -Wall 4bit-cli.c $(TCDB_STATIC) -o 4bit-cli
 
 $(TCDB_STATIC):
 	cd $(TCDB_DIR) && make staticlib
